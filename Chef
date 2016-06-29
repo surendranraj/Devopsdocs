@@ -1,5 +1,101 @@
-Chef server:
-URl: https://www.linode.com/docs/applications/chef/deploy-a-chef-server-workstation-and-node-on-ubuntu-14-04
+Chef
+Chef is an automation platform that “turns infrastructure into code,” allowing users to manage and deploy resources across multiple servers, or nodes. Chef allows users to create and download recipes (stored in cookbooks) to automate content and policies on these nodes.
+Chef is comprised of a Chef server, one or more workstations, and a number of nodes that are managed by the chef-client installed on each node
+
+Chef server: Instance 1
+=========================
+The Chef server is the hub of interaction between all workstations and nodes using Chef. Changes made through workstations are uploaded to the Chef server, which is then accessed by the chef-client and used to configure each individual node.
+
+ Reference link: https://www.linode.com/docs/applications/chef/deploy-a-chef-server-workstation-and-node-on-ubuntu-14-04
+1. Install chef server
+--------------------------------
+wget https://packages.chef.io/stable/ubuntu/14.04/chef-server-core_12.7.0-1_amd64.deb
+
+sudo dpkg -i chef-server-core_12.7.0-1_amd64.deb
+
+rm chef-server-core_12.7.0-1_amd64.deb
+
+sudo chef-server-ctl reconfigure
+
+------------------------------------
+2. Install chef manager (used as a gui for chef server)
+
+wget https://packages.chef.io/stable/ubuntu/14.04/chef-manage_2.4.0-1_amd64.deb
+
+sudo dpkg -i chef-manage_2.4.0-1_amd64.deb
+
+rm chef-manage_2.4.0-1_amd64.deb
+
+sudo chef-manage-ctl reconfigure
+
+------------------------------------
+3. Create a User and Organization
+
+mkdir .chef
+
+sudo chef-server-ctl user-create admin Naresh Babu nareshbabubc@gmail.com admin@123 --filename ~/.chef/admin.pem
+
+sudo chef-server-ctl org-create times Timesjob --association_user admin --filename ~/.chef/times.pem
+
+lauuch the ip in the browser-> https://104.196.58.46/80 or https://104.196.58.46
 chef server:https://104.196.58.46
-admin
-admin@123
+user name: admin
+password: admin@123
+--------------------------------------------------
+Workstations
+=============
+Your Chef workstation will be where you create and configure any recipes, cookbooks, attributes, and other changes made to your Chef configurations. Although this can be a local machine of any OS, there is some benefit to keeping a remote server as your workstation since it can be accessed from anywhere.
+
+Installing chef workstation: Instance 2
+========================================
+----------------------------------------------
+wget https://packages.chef.io/stable/ubuntu/12.04/chefdk_0.15.15-1_amd64.deb
+
+sudo dpkg -i chefdk_0.15.15-1_amd64.deb
+
+rm chefdk_0.15.15-1_amd64.deb
+
+chef verify
+
+chef generate repo chef-repo
+
+cd chef-repo
+
+mkdir .chef
+
+get the private key of chef server using ssh -i keygen**********
+
+create a file as admin.pem under .chef folder and change the host in server under /etc/host
+
+restart the server and manager as below(in chef server instance)
+sudo chef-server-ctl reconfigure
+sudo chef-manage-ctl reconfigure
+
+get the knife.rb by logging to https://104.196.58.46/ -> organisation -> manage organisation -> select orgainsation -> generate knife config 
+copy and create a file as knife.rb inside /.chef folder in workstation (change some information in knife.rb file such as organisation short name and username)
+
+cd ..
+knife ssl fetch
+
+knife client list
+-----------------------------------------------------
+validator.pem will be generated .
+
+if it is working fine then chef server and worstation configured correctly.
+
+Bootstrap a Node : Instance 3
+================================
+Bootstrapping a node installs the chef-client and validates the node, allowing it to read from the Chef server and make any needed configuration changes picked up by the chef-client in the future.
+
+----------------------------
+Get the node ip
+
+save the node .pem file in the folder for the below operation
+
+knife bootstrap 123.45.67.89 -x nareshbabu -i password.pem --node-name node1
+add other nodes accordingly
+
+knife node list
+
+
+
