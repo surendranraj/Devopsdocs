@@ -101,3 +101,7 @@ knife node list
 
 Chef cook book:
 ref link: https://www.linode.com/docs/applications/chef/creating-your-first-chef-cookbook
+
+
+connecting workstation to nodes: knife ssh Name:* "sudo chef-client" -a cloud_v2.public_ipv4 -i /home/nar
+eshbabubc/sshKey/nodegroup.pem 
