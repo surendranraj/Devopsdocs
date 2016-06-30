@@ -63,7 +63,7 @@ cd chef-repo
 
 mkdir .chef
 
-get the private key of chef server using ssh -i keygen**********
+get the private key of chef server using ssh-keygen -b 4096 -t rsa (ssh-keygen -b 4096 -t rsa -n naresh)
 
 create a file as admin.pem under .chef folder and change the host in server under /etc/host
 
