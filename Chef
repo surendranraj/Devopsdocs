@@ -92,10 +92,12 @@ Get the node ip
 
 save the node .pem file in the folder for the below operation
 
-knife bootstrap 123.45.67.89 -x nareshbabu -i password.pem --node-name node1
+knife bootstrap 123.45.67.89 -x nareshbabu -i password.pem --node-name node1 --sudo
 add other nodes accordingly
 
 knife node list
 
 
 
+Chef cook book:
+ref link: https://www.linode.com/docs/applications/chef/creating-your-first-chef-cookbook
