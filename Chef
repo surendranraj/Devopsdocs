@@ -37,7 +37,7 @@ sudo chef-server-ctl user-create admin Naresh Babu nareshbabubc@gmail.com admin@
 
 sudo chef-server-ctl org-create times Timesjob --association_user admin --filename ~/.chef/times.pem
 
-lauuch the ip in the browser-> https://104.196.58.46/80 or https://104.196.58.46
+launch the ip in the browser-> https://104.196.58.46/80 or https://104.196.58.46
 chef server:https://104.196.58.46
 user name: admin
 password: admin@123
@@ -102,6 +102,26 @@ knife node list
 Chef cook book:
 ref link: https://www.linode.com/docs/applications/chef/creating-your-first-chef-cookbook
 
+Create a cook book:
+cd chef-repo
+
+knife cookbook create lamp-stack ("lamp-stack" project name)
+
+cd cookbooks/lamp-stack
+
+we should see the below folders within that
+attributes    definitions  libraries    providers  recipes    templates
+CHANGELOG.md  files        metadata.rb  README.md  resources
+
+we have to update all the information in the recepies folder.
+
+cd recipes
+
+edit default.rb and add the below lines
+execute "update-upgrade" do
+  command "apt-get update && apt-get upgrade -y"
+  action :run
+end
 
 connecting workstation to nodes: knife ssh Name:* "sudo chef-client" -a cloud_v2.public_ipv4 -i /home/nar
 eshbabubc/sshKey/nodegroup.pem 
