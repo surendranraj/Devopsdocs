@@ -1,0 +1,69 @@
+#Install subversion
+
+sudo aptitude install subversion
+#set up the user and add the svn group
+
+sudo addgroup svn
+sudo gpasswd -a "nareshbabubc" svn
+
+#Setup the Repository home folder
+#In order to be able to use, create a repository home folder:
+
+sudo mkdir -p /svn/repository
+#Give access to the svn group.
+
+sudo chgrp -R svn /svn/repository
+sudo chmod -R 770 /svn/repository
+
+#logout and login for the changes to apply
+#To create your project repository, use the svnadmin command:
+svnadmin create /svn/repository/Timesjob
+
+#Create a SVN user
+#You will also need user who will need access to the repository. To create a user, use the following command:
+
+vi /svn/repository/my_project/conf/svnserve.conf
+# add to that file these three lines:
+
+anon-access = none
+auth-access = read
+password-db = passwd
+
+#After, create a password file or edit the current one:
+
+vi /svn/repository/my_project/conf/passwd
+
+#In that file add a line for your user:
+
+nareshbabubc = admin@123
+
+
+#Setup the SVN server Daemon
+#You can run manually the daemon on the host computer using the svnserve command:
+
+svnserve -d -r /svn/repository
+
+#Or, you can setup to run automatically:
+
+#Simply create a new file (I called mine svnserve) and type the command you’d like to run
+
+cd /etc/init.d/
+sudo echo "svnserve -d -r /svn/repository/mTImesjob" > svnserve
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
