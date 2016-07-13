@@ -1,0 +1,133 @@
+Teamcity: 8.0 Ubuntu
+ ref link: http://blog.fire-development.com/2014/09/23/teamcity-8-setup-on-linux/
+ 
+ Install TeamCity 8
+
+Download TeamCity. You can get the latest URL from the downloads page.
+
+ wget http://download.jetbrains.com/teamcity/TeamCity-8.1.4.tar.gz
+Unzip the downloaded file:
+
+ tar xfz TeamCity-8.1.4.tar.gz
+Move the resulting TeamCity folder to the installation directory. I chose to install TeamCity in /opt/jetbrains/TeamCity:
+
+ sudo mkdir /opt/jetbrains ; sudo mv TeamCity/ /opt/jetbrains
+Install Java, if necessary: See this post.
+
+Create a user for TeamCity:
+
+ sudo useradd teamcity
+Configure permissions:
+
+ sudo chown -R teamcity:teamcity /opt/jetbrains/TeamCity
+Configure TeamCity to start automatically with the correct user. The following steps are necessary:
+Create a file teamcity in /etc/init.d with the following content:
+
+ #!/bin/sh
+ # /etc/init.d/teamcity -  startup script for teamcity
+ export TEAMCITY_DATA_PATH="/opt/jetbrains/TeamCity/.BuildServer"
+ export TEAMCITY_SERVER_OPTS=-Djava.awt.headless=true # Configure TeamCity for use on a headless OS.
+        
+ case $1 in
+ start)
+  start-stop-daemon --start  -c teamcity --exec /opt/jetbrains/TeamCity/bin/runAll.sh start
+ ;;
+        
+ stop)
+  start-stop-daemon --start -c teamcity  --exec  /opt/jetbrains/TeamCity/bin/runAll.sh stop
+ ;;
+        
+ esac
+        
+ exit 0
+Register the file as a startup script:
+
+ sudo update-rc.d teamcity defaults
+Make the file executable:
+
+ sudo chmod +x /etc/init.d/teamcity
+If you use TeamCity behind an Apache that works as a reverse proxy, add the following to the file /opt/jetbrains/TeamCity/conf/server.xml. Add it below the already existing <Connector ... /> tag:
+
+ <Connector port="8543" protocol="org.apache.coyote.http11.Http11NioProtocol"
+             connectionTimeout="60000"
+             useBodyEncodingForURI="true"
+             socket.txBufSize="64000"
+             socket.rxBufSize="64000"
+             tcpNoDelay="1"
+             scheme="https"
+             proxyName="<ServerName of the virtual server in Apache>"
+             proxyPort="443"/>
+See this post to learn the necessary configuration in Apache if you want to use it as a reverse proxy.
+Start TeamCity:
+
+sudo service teamcity start
+Navigate to http://<your server>:8111 and verify that you are getting the “TeamCity First Start” page.
+Click “Proceed” once.
+Stop TeamCity:
+
+sudo service teamcity stop
+Note: The default port for TeamCity on Linux is 8111. If you want to use port 80, TeamCity has to run as root.
+
+Install and configure database
+
+TeamCity comes with an internal database. This database is unsupported by JetBrains and not meant for production use. JetBrains suggests the use of MySQL and so that’s what we are going to use:
+
+Install MySQL
+
+sudo apt-get install mysql-server  
+Make sure you specify a password for the MySQL root user when prompted.
+
+Setup MySQL for TeamCity:
+
+Start MySQL console:
+
+ sudo mysql -u root -p
+When prompted, enter the password you specified during installation.
+
+Create TeamCity database:
+
+ create database teamcity character set UTF8 collate utf8_bin;
+Use TeamCity database:
+
+ USE teamcity
+Create TeamCity user:
+
+ create user 'teamcityuser'@'localhost' identified by '<password>';
+Give TeamCity user all privileges on the database:
+
+ grant all privileges on teamcity.* to 'teamcityuser'@'localhost';
+This is necessary because TeamCity actively changes the schema.
+
+Configure TeamCity to use MySQL
+
+Download MySQL JDBC driver from http://dev.mysql.com/downloads/connector/j/:
+
+ wget http://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java-5.1.31.tar.gz -O mysql-connector.tar.gz
+Extract it:
+
+ tar zxvf mysql-connector.tar.gz
+Move mysql-connector-java-5.1.31-bin.jar from the extracted directory to /opt/jetbrains/TeamCity/.BuildServer/lib/jdbc/:
+
+ sudo mv mysql-connector-java-5.1.31/mysql-connector-java-5.1.31-bin.jar /opt/jetbrains/TeamCity/.BuildServer/lib/jdbc/
+Fix the permissions for the file:
+
+ sudo chown teamcity:teamcity /opt/jetbrains/TeamCity/.BuildServer/lib/jdbc/mysql-connector-java-5.1.31-bin.jar
+Start TeamCity:
+
+ service teamcity start
+Navigate to http://<your server>:8111.
+Click “Proceed”
+You will now be on the “TeamCity Database Creation” screen. Perform the following settings:
+Select MySQL as the database type
+If you get the message that the MySQL driver is not could not be found or is not loaded, click on “Refresh JDBC drivers”. You should then see the text “Loaded MySQL JDBC driver version: 5.1”.
+Enter teamcity as “Database name”.
+Enter teamcityuser as “User name”.
+For “Password”, enter the password you used when creating the database user.
+Click “Proceed”. If the button is not active, select another database type from the dropdown list and then select MySQL again. The button should now be active.
+Wait while TeamCity creates the database and initializes itself.
+Accept the license agreement.
+Create an administrator account.
+You should now be seeing the TeamCity profile page.
+In the upper right corner, click on Administration, then select Global Settings under the Server Administration heading on the left side.
+Verify the TeamCity configuration that is being displayed and make sure it says that it uses MySQL as the database.
+
