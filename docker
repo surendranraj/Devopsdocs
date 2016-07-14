@@ -1,0 +1,2 @@
+to remove all the images based on tag name
+sudo docker images | awk -F" " '$2 == "1.0" { print $1"\t"$3 }'| sudo docker rmi $(docker images -q)
