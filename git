@@ -1,0 +1,4 @@
+pulling a particular branch
+
+#git clone -b branchname --single-branch https://github.com/narezchand/Devopsdocs.git
+git clone -b branch1 --single-branch https://github.com/narezchand/Devopsdocs.git
