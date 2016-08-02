@@ -1,0 +1,6 @@
+wget https://apt.puppetlabs.com/puppetlabs-release-trusty.deb
+sudo dpkg -i puppetlabs-release-trusty.deb 
+sudo sh -c 'echo "deb http://apt.puppetlabs.com// trusty main" >> /etc/apt/sources.list.d/puppet.list'
+sudo apt-get update
+sudo apt-get install puppet
+puppet --version
