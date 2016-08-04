@@ -15,3 +15,7 @@ When asked, select 'Express Install' After the installer has finished, make sure
 You should now be able to access Jira in the browser to finish installation at:
 
 http://your.droplet.ip:8080
+
+
+U:admin
+P: admin@123
