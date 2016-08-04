@@ -1,0 +1,17 @@
+Ref link:https://www.digitalocean.com/community/questions/using-and-installing-jira
+
+You can definitely host a Jira instance on DigitalOcean. Though Jira is commerical software, and you'll need to purchase a license from them. They has an installation guide for Linux that you can find here.
+
+They also provide an installer for the trial version that you can download onto your droplet and run. For instance, to download their 64bit trial edition, use:
+
+wget http://www.atlassian.com/software/jira/downloads/binary/atlassian-jira-6.2.4-x64.bin
+Make the file executable and then run it with:
+
+chmod +x atlassian-jira-6.2.4-x64.bin
+./atlassian-jira-6.2.4-x64.bin
+When asked, select 'Express Install' After the installer has finished, make sure Jira is running by:
+
+/opt/atlassian/jira/bin/start-jira.sh
+You should now be able to access Jira in the browser to finish installation at:
+
+http://your.droplet.ip:8080
